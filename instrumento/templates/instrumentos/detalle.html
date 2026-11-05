@@ -1,0 +1,24 @@
+{% extends "instrumentos/base.html" %}
+
+{% block title %}{{ instrumento.nombre }} | Ritmo{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="detalle-cabecera">
+        <p class="categoria">{{ instrumento.get_categoria_display }} · {{ instrumento.marca }}</p>
+        <h1>{{ instrumento.nombre }}</h1>
+    </div>
+    <dl class="detalle">
+        <div><dt>Marca</dt><dd>{{ instrumento.marca }}</dd></div>
+        <div><dt>Categoría</dt><dd>{{ instrumento.get_categoria_display }}</dd></div>
+        <div><dt>Precio</dt><dd>${{ instrumento.precio|floatformat:0 }}</dd></div>
+        <div><dt>Unidades en stock</dt><dd>{{ instrumento.stock }}</dd></div>
+        <div><dt>Descripción</dt><dd class="descripcion">{{ instrumento.descripcion|default:"Sin descripción." }}</dd></div>
+    </dl>
+    <div class="acciones">
+        <a class="boton" href="{% url 'instrumentos:editar' instrumento.pk %}">Editar instrumento</a>
+        <a class="boton boton-secundario" href="{% url 'instrumentos:lista' %}">Volver al catálogo</a>
+        <a class="boton boton-peligro" href="{% url 'instrumentos:eliminar' instrumento.pk %}">Eliminar</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "instrumentos/base.html" %}
+
+{% block title %}Eliminar instrumento | Ritmo{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <span class="etiqueta-superior">Confirmación</span>
+    <h1>Eliminar instrumento</h1>
+    <p>¿Confirmas que deseas eliminar <strong>{{ instrumento.nombre }} — {{ instrumento.marca }}</strong>? Esta acción no se puede deshacer.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="acciones">
+            <button class="boton boton-peligro" type="submit">Sí, eliminar</button>
+            <a class="boton boton-secundario" href="{% url 'instrumentos:detalle' instrumento.pk %}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
