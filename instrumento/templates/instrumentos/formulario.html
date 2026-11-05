@@ -1,0 +1,27 @@
+{% extends "instrumentos/base.html" %}
+
+{% block title %}{{ titulo }} | Ritmo{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <span class="etiqueta-superior">Tu tienda, tu música</span>
+    <h1>{{ titulo }}</h1>
+    <p class="subtitulo">Completa los datos del instrumento. El precio debe ser mayor que cero y el stock no puede ser negativo.</p>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="campo">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="ayuda">{{ field.help_text }}</p>{% endif %}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        {{ form.non_field_errors }}
+        <div class="acciones">
+            <button class="boton" type="submit">Guardar instrumento</button>
+            <a class="boton boton-secundario" href="{% url 'instrumentos:lista' %}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "instrumentos/base.html" %}
+
+{% block title %}Catálogo | Ritmo{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-texto">
+        <span class="etiqueta-superior">Tu próxima canción empieza aquí</span>
+        <h1>Encuentra el sonido que <span>te mueve.</span></h1>
+        <p class="subtitulo">Instrumentos con carácter, para músicos que hacen de cada nota algo suyo.</p>
+        <div class="hero-acciones">
+            <a class="boton boton-claro" href="#catalogo">Explorar instrumentos <span aria-hidden="true">↓</span></a>
+            <a class="hero-link" href="{% url 'instrumentos:crear' %}">Administrar catálogo ↗</a>
+        </div>
+    </div>
+    <div class="hero-ilustracion" aria-hidden="true">
+        <svg viewBox="0 0 260 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M127 33c4-8 12-11 20-7 8 4 10 12 6 20l-9 19 29 13-7 15-30-14-61 132c18 16 21 41 10 63-14 28-45 38-71 25-27-13-36-44-22-70 11-22 33-34 57-28l61-132-30-14 7-15 29 14 11-21Z" fill="#C77B46"/>
+            <path d="m136 55 27 13M74 194c-19-9-42-1-51 18-10 20-2 42 17 51 20 9 42 1 52-18 9-19 1-42-18-51Z" fill="#E5B878"/>
+            <path d="M95 220c-7-8-19-11-29-7-10 4-16 15-15 26 1 10 9 19 20 21 10 2 21-4 26-13 5-9 4-20-2-27Z" fill="#302923"/>
+            <path d="m131 80-69 149M139 84l-69 149M151 91 82 240" stroke="#F5E7CD" stroke-width="2"/>
+            <path d="m150 63 21-43M145 60l9-19M158 67l9-19" stroke="#E5B878" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+    </div>
+</section>
+
+<section class="seccion-catalogo" id="catalogo">
+<div class="encabezado">
+    <div>
+        <span class="etiqueta-superior">La colección</span>
+        <h2>Instrumentos destacados <span class="contador">{{ total_instrumentos }} productos</span></h2>
+        <p class="subtitulo">Explora nuestra selección y encuentra tu próximo compañero musical.</p>
+    </div>
+    <a class="boton" href="{% url 'instrumentos:crear' %}"><span aria-hidden="true">＋</span> Agregar instrumento</a>
+</div>
+{% if instrumentos %}
+    <section class="tarjetas" aria-label="Instrumentos disponibles">
+        {% for instrumento in instrumentos %}
+            <article class="tarjeta">
+                <div class="tarjeta-arte" aria-hidden="true">
+                    <span class="instrumento-icono">
+                        {% if instrumento.categoria == "cuerda" %}♫
+                        {% elif instrumento.categoria == "viento" %}♬
+                        {% elif instrumento.categoria == "percusion" %}◉
+                        {% elif instrumento.categoria == "teclado" %}▦
+                        {% else %}♪{% endif %}
+                    </span>
+                </div>
+                <div class="tarjeta-contenido">
+                    <p class="categoria">{{ instrumento.get_categoria_display }}</p>
+                    <h3 title="{{ instrumento.nombre }}">{{ instrumento.nombre }}</h3>
+                    <p class="marca-instrumento">{{ instrumento.marca }}</p>
+                    <div class="precio-stock">
+                        <p class="precio">${{ instrumento.precio|floatformat:0 }}</p>
+                        <span class="stock{% if instrumento.stock == 0 %} stock-agotado{% endif %}">
+                            {% if instrumento.stock == 0 %}Agotado{% else %}{{ instrumento.stock }} en stock{% endif %}
+                        </span>
+                    </div>
+                    <div class="acciones">
+                        <a class="boton boton-secundario" href="{% url 'instrumentos:detalle' instrumento.pk %}">Ver instrumento ↗</a>
+                        <a class="boton boton-secundario" href="{% url 'instrumentos:editar' instrumento.pk %}" aria-label="Editar {{ instrumento.nombre }}">✎</a>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <section class="vacio">
+        <div class="vacio-icono" aria-hidden="true">♫</div>
+        <h2>Todo gran sonido empieza con una nota</h2>
+        <p>Aún no hay instrumentos en la colección. ¡Agrega el primero!</p>
+        <a class="boton" href="{% url 'instrumentos:crear' %}">Agregar primer instrumento</a>
+    </section>
+{% endif %}
+</section>
+{% endblock %}
