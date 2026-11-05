@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -25,7 +25,16 @@ class Instrumento(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
-    stock = models.PositiveIntegerField("stock", default=0)
+    stock = models.PositiveIntegerField(
+        "stock",
+        default=0,
+        validators=[
+            MaxValueValidator(
+                100,
+                message="Las unidades en stock no pueden superar 100.",
+            )
+        ],
+    )
     descripcion = models.TextField("descripción", blank=True)
 
     class Meta:

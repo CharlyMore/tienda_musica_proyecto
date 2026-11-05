@@ -28,10 +28,43 @@ class InstrumentoFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("precio", form.errors)
 
+    def test_acepta_limites_del_precio(self):
+        for precio in ("100000", "10000000"):
+            with self.subTest(precio=precio):
+                form = InstrumentoForm(self.datos_validos(precio=precio))
+                self.assertTrue(form.is_valid(), form.errors)
+
+    def test_rechaza_precio_fuera_de_limites(self):
+        for precio in ("99999.99", "10000000.01"):
+            with self.subTest(precio=precio):
+                form = InstrumentoForm(self.datos_validos(precio=precio))
+                self.assertFalse(form.is_valid())
+                self.assertIn("precio", form.errors)
+
     def test_rechaza_stock_negativo(self):
         form = InstrumentoForm(self.datos_validos(stock="-1"))
         self.assertFalse(form.is_valid())
         self.assertIn("stock", form.errors)
+
+    def test_rechaza_stock_cero_con_mensaje(self):
+        form = InstrumentoForm(self.datos_validos(stock="0"))
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["stock"],
+            ["Las unidades en stock no pueden ser 0."],
+        )
+
+    def test_acepta_stock_maximo_de_cien(self):
+        form = InstrumentoForm(self.datos_validos(stock="100"))
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_rechaza_stock_mayor_a_cien_con_mensaje(self):
+        form = InstrumentoForm(self.datos_validos(stock="101"))
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["stock"],
+            ["Las unidades en stock no pueden superar 100."],
+        )
 
 
 class PruebasConContrasenasRapidas(TestCase):
@@ -75,7 +108,7 @@ class InstrumentoCrudTests(PruebasConContrasenasRapidas):
                 "nombre": "Teclado",
                 "marca": "Casio",
                 "categoria": Instrumento.Categoria.TECLADO,
-                "precio": "85000.00",
+                "precio": "185000.00",
                 "stock": "2",
                 "descripcion": "",
             },
@@ -269,6 +302,16 @@ class InstrumentoAPITests(PruebasConContrasenasRapidas):
         self.assertIn("precio", respuesta_invalida.data)
         self.assertIn("stock", respuesta_invalida.data)
         self.assertEqual(Instrumento.objects.count(), 1)
+
+    def test_api_rechaza_stock_mayor_a_cien(self):
+        respuesta = self.api.post(
+            self.list_url,
+            self.datos_validos(stock=101),
+            format="json",
+        )
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertIn("stock", respuesta.data)
+        self.assertEqual(Instrumento.objects.count(), 0)
 
     def test_put_actualiza_y_delete_elimina_registro(self):
         instrumento = Instrumento.objects.create(**self.datos_validos())
